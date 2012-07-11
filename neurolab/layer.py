@@ -48,7 +48,55 @@ class Perceptron(Layer):
         self.s = np.sum(self.np['w'] * inp, axis=1)
         self.s += self.np['b']
         return self.transf(self.s)
-     
+
+
+class Convolution(Layer):
+    """
+    Convolutional Perceptron layer
+
+    :Parameter
+        ci: int
+            Number of input
+        cb: int
+            Number of inputs in each batch
+        cbo: int
+            Number of outputs of each batch
+        shift: int
+            Number of neurons shifted after each batch
+        transf: callable
+            Transfer function
+
+        :Example:
+            >>> import neurolab as nl
+            >>> # Create a convolutional layer with 10 inputs, 3 output, 3
+                inputs in each batch.
+            >>> l = Convolution(10, 3, 3, nl.trans.PureLin())
+            
+    """
+    def __init__(self, ci, cb, transf, cbo=1, shift=1):
+        
+        Layer.__init__(self, ci, cn, cn, {'w': (cn, cb), 'b': cn})
+        self.cb = cb
+        self.shift = shift
+        self.transf = transf
+
+    def _step(self, inp):
+        slices = self.slice(inp, self.cb, self.shift)
+        self.s = np.sum(self.np["w"] * slices, xaxis=1)
+        self.s += self.np["b"]
+        return self.transf(self.s)
+
+    @classmethod
+    def slice(inp, cb, shift):
+        assert len(inp.shape) == 1
+        left = 0
+        result = []
+        while left <= inp.size - cb:
+            result.append(inp[left:left + cb])
+            left += shift
+        return np.concatenate(result)
+            
+>>>>>>> a07f0b8d73a474e9a694cc7855293237c05d9bc7
 
 class Competitive(Layer):
     """ 
@@ -90,4 +138,8 @@ class Competitive(Layer):
         d = self.distf(self.np['w'], inp.reshape([1,len(inp)]))
         self.last_dist = d
         out = self.transf(self.np['conscience'] * d)
+<<<<<<< HEAD
         return out
+=======
+        return out
+>>>>>>> a07f0b8d73a474e9a694cc7855293237c05d9bc7
